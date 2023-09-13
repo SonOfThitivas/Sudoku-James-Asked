@@ -2,13 +2,8 @@ from tkinter import *
 
 root = Tk()
 root.title("Sudoku James Asked")
-rowcol = [[],[],[],[],[],[],[],[],[]]
-# varrowcol =[[],[],[],[],[],[],[],[],[]]
-for i in range(9):
-    for j in range(9):
-        rowcol[i].append(0)
-        # varrowcol[i].append(IntVar)
 Label( text="Sudoku James Asked", font=24).pack()
+
 frm1 = Frame(root)
 vr1c1, vr1c2, vr1c3, vr1c4, vr1c5, vr1c6, vr1c7, vr1c8, vr1c9 = [StringVar() for i in range(9)]
 vr2c1, vr2c2, vr2c3, vr2c4, vr2c5, vr2c6, vr2c7, vr2c8, vr2c9 = [StringVar() for i in range(9)]
@@ -19,6 +14,16 @@ vr6c1, vr6c2, vr6c3, vr6c4, vr6c5, vr6c6, vr6c7, vr6c8, vr6c9 = [StringVar() for
 vr7c1, vr7c2, vr7c3, vr7c4, vr7c5, vr7c6, vr7c7, vr7c8, vr7c9 = [StringVar() for i in range(9)]
 vr8c1, vr8c2, vr8c3, vr8c4, vr8c5, vr8c6, vr8c7, vr8c8, vr8c9 = [StringVar() for i in range(9)]
 vr9c1, vr9c2, vr9c3, vr9c4, vr9c5, vr9c6, vr9c7, vr9c8, vr9c9 = [StringVar() for i in range(9)]
+
+vrowcol = [[vr1c1, vr1c2, vr1c3, vr1c4, vr1c5, vr1c6, vr1c7, vr1c8, vr1c9],
+           [vr2c1, vr2c2, vr2c3, vr2c4, vr2c5, vr2c6, vr2c7, vr2c8, vr2c9],
+           [vr3c1, vr3c2, vr3c3, vr3c4, vr3c5, vr3c6, vr3c7, vr3c8, vr3c9],
+           [vr4c1, vr4c2, vr4c3, vr4c4, vr4c5, vr4c6, vr4c7, vr4c8, vr4c9],
+           [vr5c1, vr5c2, vr5c3, vr5c4, vr5c5, vr5c6, vr5c7, vr5c8, vr5c9],
+           [vr6c1, vr6c2, vr6c3, vr6c4, vr6c5, vr6c6, vr6c7, vr6c8, vr6c9],
+           [vr7c1, vr7c2, vr7c3, vr7c4, vr7c5, vr7c6, vr7c7, vr7c8, vr7c9],
+           [vr8c1, vr8c2, vr8c3, vr8c4, vr8c5, vr8c6, vr8c7, vr8c8, vr8c9],
+           [vr9c1, vr9c2, vr9c3, vr9c4, vr9c5, vr9c6, vr9c7, vr9c8, vr9c9]]
 
 # Label
 for i in range(9):  
@@ -42,7 +47,7 @@ r2c3 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c3).grid(r
 r2c4 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c4).grid(row=2,column=4)
 r2c5 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c5).grid(row=2,column=5)
 r2c6 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c6).grid(row=2,column=6)
-r2c7 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c7).grid(row=2,column=7)
+r2c7 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c7).grid(row=2,column=7)  
 r2c8 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c8).grid(row=2,column=8)
 r2c9 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr2c9).grid(row=2,column=9)
 # Row 3
@@ -118,7 +123,7 @@ r9c9 =  Entry(frm1, font=24, width=2, justify=CENTER, textvariable=vr9c9).grid(r
 
 
 def checker():
-    print(vr1c1.get())
+    return 0
     
 frm1.pack()
 Button(root, text="Submit", font=32, command=checker).pack(pady=10)
