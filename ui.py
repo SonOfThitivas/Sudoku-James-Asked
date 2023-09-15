@@ -29,15 +29,15 @@ vrowcol = [[vr1c1, vr1c2, vr1c3, vr1c4, vr1c5, vr1c6, vr1c7, vr1c8, vr1c9],
            [vr9c1, vr9c2, vr9c3, vr9c4, vr9c5, vr9c6, vr9c7, vr9c8, vr9c9]]
 
 # initial random 30 numbers at first
-for i in range(30):
-    for row in range(9):
-        for col in range(9):
-            rdrow, rdcol= [randint(0,8) for n in range(2)]
-            num = randint(1,9)
-            if row == rdrow and col == rdcol:
-                continue
-            elif(row == rdrow or col == rdcol) and (vrowcol[row][col] != str(num)):
-                vrowcol[rdcol][rdcol].set(str(num))
+# for i in range(30):
+#     for row in range(9):
+#         for col in range(9):
+#             rdrow, rdcol= [randint(0,8) for n in range(2)]
+#             num = randint(1,9)
+#             if row == rdrow and col == rdcol:
+#                 continue
+#             elif(row == rdrow or col == rdcol) and (vrowcol[row][col] != str(num)):
+#                 vrowcol[rdcol][rdcol].set(str(num))
             # else:   
             #     vrowcol[rdcol][rdcol].set(str(num))
 
