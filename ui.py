@@ -1,9 +1,79 @@
 from tkinter import *
 from random import randint
 
+# check in 3x3 table
+def checkInput3x3(value, row, col): # row is 1 table
+    global rowcol3x3, vrowcol3x3 , rowcolLatest
+    # if there is any input
+    if rowcol3x3[row][col]["state"] == "disabled":
+        return 0 # already input stop the function
+    
+    # check table 3x3 # only 1 loop because in vrowcol3x3 in one row = one table has changed row already # list setup
+    for i in range(9): # in colunmn 
+        if col == i: # point the same row and column
+                continue # do not check
+        elif (vrowcol3x3[row][i]).get() == value: # if there is a same number
+            return row, i # return row and column that the same value
+    
+    # if nothing is wrong
+    vrowcol3x3[row][col].set(value)
+    rowcol3x3[row][col].configure(state="disabled")
+    rowcolLatest.append(rowcol3x3[row][col])
+    return None
+    
+# check in table 9x9
+def checkInput9x9(value, row, col):
+    global rowcol9x9, vrowcol9x9 , rowcolLatest
+    # if there is any input
+    if rowcol9x9[row][col]["state"] == "disabled":
+        return 0 # already input stop the function
+    
+    result = [] # a list for return same value in tuple
+    # check table 9x9
+    for r in range(9): # loop in column with slicing rows
+        if r == row: # the same row and column will skip
+            continue
+        elif  value == (vrowcol9x9[r][col]).get(): # if there is a same number in row
+            result.append((r, col)) # add row and column that the same value
+            
+    for c in range(9): # loop in row with slicing columns
+        if c == col: # the same row and column will skip
+            continue
+        elif  value == (vrowcol9x9[row][c]).get(): # if there is a same number in row
+            result.append((row, c)) # add row and column that the same value
+            
+    if len(result) == 0: # if nothing is wrong
+        vrowcol9x9[row][col].set(str(value))
+        rowcol9x9[row][col].configure(state="disabled")
+        rowcolLatest.append(rowcol9x9[row][col])
+        return None
+    else:
+        return result
+    
+# submit button
+def submit():
+    global rowcol3x3, vrowcol3x3 ,rowcol9x9, vrowcol9x9 , rowcolLatest, labelBottomFrame
+    # check all
+    for row in range(9):
+        for col in range(9):
+            checkInput3x3(vrowcol3x3[row][col].get(), row, col)
+            checkInput9x9(vrowcol9x9[row][col].get(), row, col)
+
+# function previous event
+def previous():
+    global vrowcol, rowcol, rowcolLatest # take variables outside the function
+    rowcolIndex = rowcolLatest.pop() # take a last widget
+    row = rowcolIndex[0] # row of latest widget
+    col = rowcolIndex[1] # col of latest widget
+    rowcol[row][col].configure(state="normal") # be normal
+    vrowcol[row][col].set("") # clear a input
+
+
+        
 root = Tk() # declear module
 root.title("Sudoku James Asked") # title of the window
 Label( text="Sudoku James Asked", font=24).pack() # text on head
+rowcolLatest = [] # contain all widgets that happens
 
 # define variables to contain data
 vr1c1, vr1c2, vr1c3, vr1c4, vr1c5, vr1c6, vr1c7, vr1c8, vr1c9 = [StringVar() for i in range(9)]
@@ -304,122 +374,19 @@ row3col3Frame.grid(row=3,column=3, padx=2)
 
 tableFrame.pack() # pack a frame
 
-
-
-# contain widgets that are disabled
-rowcolLatest = []
-
-
 # initial random 30 numbers at first
 for time in range(30):
     row = randint(0,8)
     col = randint(0,8)
     num = randint(1,9)
-    if vrowcol[row][col].get() == "":
-        vrowcol[row][col].set(str(num))
-        rowcolLatest.append(rowcol[row][col])
-        
-def checker3x3():
-    global vrowcol3x3, vrowcol9x9, rowcol, rowcolLatest # take variables outside the function
-    flag = False
-    # check table 3x3
-    for checkRow in range(9):
-        for checkCol in range(9):
-            if not(vrowcol3x3[checkRow][checkCol].get()).isdigit(): # If it is float, alphabet, decimal, negative integer
-                continue
-            else:
-                # if there is 1 character, range 1-9
-                if len(vrowcol3x3[checkRow][checkCol].get()) == 1 and int(vrowcol3x3[checkRow][checkCol].get()) > 0 and int(vrowcol3x3[checkRow][checkCol].get()) < 10:
-                    # loop to check other rows and columns
-                    for otherRow3x3 in range(9):
-                        for otherCol3x3 in range(9):
-                            if checkRow == otherRow3x3 and checkCol == otherCol3x3: # do not check in the same table
-                                continue
-                            elif vrowcol3x3[otherRow3x3][otherCol3x3].get() == vrowcol3x3[checkRow][checkCol].get():
-                                return False # case same in the table 3x3
-                            
-def checker9x9():
-    for checkRow in range(9):
-        for checkCol in range(9):
-            if not(vrowcol9x9[checkRow][checkCol].get()).isdigit(): # If it is float, alphabet, decimal, negative integer
-                return 0 # case not a positive integer
-            else:
-                # if there is 1 character, range 1-9
-                if len(vrowcol3x3[checkRow][checkCol].get()) == 1 and int(vrowcol3x3[checkRow][checkCol].get()) > 0 and int(vrowcol3x3[checkRow][checkCol].get()) < 10:
-                    # loop to check other rows and columns
-                    for otherRow3x3 in range(9):
-                        for otherCol3x3 in range(9):
-                            if checkRow == otherRow3x3 and checkCol == otherCol3x3: # do not check in the same table
-                                continue
-                            elif vrowcol3x3[otherRow3x3][otherCol3x3].get() == vrowcol3x3[checkRow][checkCol].get():
-                                return False # case same in the table 3x3
+    if vrowcol9x9[row][col].get() == "":
+        vrowcol9x9[row][col].set(str(num))
+        rowcolLatest.append(rowcol9x9[row][col])     
 
-# function for check the input row and column
-def submit():
-    global vrowcol, rowcol, rowcolLatest # take variables outside the function
-    flag = False # to break loops
-    # loop to take data in variables in a table
-    # input from rows
-    for rowinput in range(9):
-        # input from columns
-        for colinput in range(9):
-            if  not (vrowcol[rowinput][colinput].get()).isdigit(): # If it is float, alphabet, decimal, negative integer
-                resultText1.set("There are not a number(1-9) in a table.")
-            else: # if it is a positive integer
-                # if there is 1 character, range 1-9
-                if len(vrowcol[rowinput][colinput].get()) == 1 and int(vrowcol[rowinput][colinput].get()) > 0 and int(vrowcol[rowinput][colinput].get()) < 10:
-                    # loop to check other rows and columns
-                    for allrow in range(9):
-                        for allcol in range(9):
-                            # take variable loop and check loop are not the same
-                            if rowinput == allrow and colinput == allcol:
-                                continue
-                            # if there is a same number in row or column
-                            elif (vrowcol[rowinput][colinput].get() == vrowcol[allrow][allcol].get()) and (allrow == rowinput or allcol == colinput):
-                                resultText2.set("There is same number in row:{} column:{}.".format(allrow+1, allcol+1))
-                                flag = True # stop check loop
-                                break # stop column loop
-                        if flag: # stop row loop
-                            break
-                    if not(flag): # if everything is okay
-                        rowcol[rowinput][colinput].configure(state="disabled") # disables that shell
-                        rowcolLatest.append([rowinput, colinput]) # add a latest widgets that are disables
-                        resultText2.set("")                      
-                else: # if there is not 1 character, range 1-9
-                    resultText2.set("Enter only 1-9.")
-                    
-    # GAME OVER if all tables disable
-    flag = False # to break nested loop
-    for row in rowcol:
-        for column in row: # widgets
-            state = str(column["state"]) 
-            if  state == "disabled": # check state
-                continue
-            else:
-                flag = True
-                break
-                
-        if flag:
-            break
-    if not(flag): # if all widgets are disabled
-        resultText1.set("!!! GAME OVER !!!")
-        resultText2.set("!!! Thank you for playing !!!")
-
-# function previous event
-def previous():
-    global vrowcol, rowcol, rowcolLatest # take variables outside the function
-    rowcolIndex = rowcolLatest.pop() # take a last widget
-    row = rowcolIndex[0] # row of latest widget
-    col = rowcolIndex[1] # col of latest widget
-    rowcol[row][col].configure(state="normal") # be normal
-    vrowcol[row][col].set("") # clear a input
 
 buttonFrame = Frame(root) # button frame
 Button(buttonFrame, text="Submit", font=32, command=submit).grid(row=0,column=0, padx=5) # a button to check
 Button(buttonFrame, text="Previous", font=32, command=previous).grid(row=0,column=1, padx=5) # a button to pervious
 buttonFrame.pack(pady=10, anchor="center")
 
-Label(root, textvariable=resultText1, font=24).pack() # result line 1
-Label(root, textvariable=resultText2, font=24).pack() # result line 2
-    
 root.mainloop() # start window
