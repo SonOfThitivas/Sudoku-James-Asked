@@ -18,7 +18,7 @@ def checkInput3x3(value, row, col): # row is 1 table
     # if nothing is wrong
     vrowcol3x3[row][col].set(value)
     rowcol3x3[row][col].configure(state="disabled")
-    rowcolLatest.append(rowcol3x3[row][col])
+    rowcolLatest.append((row, col, 3))
     return None
     
 # check in table 9x9
@@ -45,7 +45,7 @@ def checkInput9x9(value, row, col):
     if len(result) == 0: # if nothing is wrong
         vrowcol9x9[row][col].set(str(value))
         rowcol9x9[row][col].configure(state="disabled")
-        rowcolLatest.append(rowcol9x9[row][col])
+        rowcolLatest.append((row, col, 9))
         return None
     else:
         return result
@@ -61,12 +61,17 @@ def submit():
 
 # function previous event
 def previous():
-    global vrowcol, rowcol, rowcolLatest # take variables outside the function
+    global vrowcol9x9, rowcol9x9, rowcolLatest # take variables outside the function
     rowcolIndex = rowcolLatest.pop() # take a last widget
     row = rowcolIndex[0] # row of latest widget
     col = rowcolIndex[1] # col of latest widget
-    rowcol[row][col].configure(state="normal") # be normal
-    vrowcol[row][col].set("") # clear a input
+    table = rowcolIndex[2]
+    if table == 3:
+        rowcol3x3[row][col].configure(state="normal") # be normal
+        vrowcol3x3[row][col].set("") # clear a input
+    else:
+        rowcol9x9[row][col].configure(state="normal") # be normal
+        vrowcol9x9[row][col].set("") # clear a input
 
 
         
@@ -381,8 +386,7 @@ for time in range(30):
     num = randint(1,9)
     if vrowcol9x9[row][col].get() == "":
         vrowcol9x9[row][col].set(str(num))
-        rowcolLatest.append(rowcol9x9[row][col])     
-
+        rowcol9x9[row][col].configure(state="disabled")
 
 buttonFrame = Frame(root) # button frame
 Button(buttonFrame, text="Submit", font=32, command=submit).grid(row=0,column=0, padx=5) # a button to check
