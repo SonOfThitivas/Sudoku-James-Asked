@@ -4,10 +4,6 @@ from random import randint
 # check in 3x3 table
 def checkInput3x3(value, row, col): # row is 1 table
     global rowcol3x3, vrowcol3x3 , rowcolLatest
-    # if there is any input
-    if rowcol3x3[row][col]["state"] == "disabled":
-        return 0 # already input stop the function
-    
     # check table 3x3 # only 1 loop because in vrowcol3x3 in one row = one table has changed row already # list setup
     for i in range(9): # in colunmn 
         if col == i: # point the same row and column
@@ -16,18 +12,13 @@ def checkInput3x3(value, row, col): # row is 1 table
             return row, i # return row and column that the same value
     
     # if nothing is wrong
-    vrowcol3x3[row][col].set(value)
-    rowcol3x3[row][col].configure(state="disabled")
-    rowcolLatest.append((row, col, 3))
     return None
     
 # check in table 9x9
-def checkInput9x9(value, row, col):
+def checkInput9x9(value, row, col, returnFrom3x3):
+    if returnFrom3x3 != None:
+        return 0
     global rowcol9x9, vrowcol9x9 , rowcolLatest
-    # if there is any input
-    if rowcol9x9[row][col]["state"] == "disabled":
-        return 0 # already input stop the function
-    
     result = [] # a list for return same value in tuple
     # check table 9x9
     for r in range(9): # loop in column with slicing rows
@@ -56,8 +47,8 @@ def submit():
     # check all
     for row in range(9):
         for col in range(9):
-            checkInput3x3(vrowcol3x3[row][col].get(), row, col)
-            checkInput9x9(vrowcol9x9[row][col].get(), row, col)
+            returnFrom3x3 = checkInput3x3(vrowcol3x3[row][col].get(), row, col)
+            checkInput9x9(vrowcol9x9[row][col].get(), row, col, returnFrom3x3)
 
 # function previous event
 def previous():
@@ -72,7 +63,20 @@ def previous():
     else:
         rowcol9x9[row][col].configure(state="normal") # be normal
         vrowcol9x9[row][col].set("") # clear a input
-
+        
+def init_random(n):
+    for time in range(n):
+        row = randint(0,8)
+        col = randint(0,8)
+        num = randint(1,9)
+        if vrowcol9x9[row][col].get() == "":
+            vrowcol9x9[row][col].set(str(num))
+    
+    submit()
+    for i in range(9):
+        for j in range(9):
+            if rowcol9x9[i][j]["state"] != "disabled":
+                vrowcol9x9[i][j].set("")
 
         
 root = Tk() # declear module
@@ -270,7 +274,7 @@ Label(row0col3Frame, text="9", font=24).grid(row=0,column=2,padx=2)
 # show rows
 Label(row1col0Frame, text="1", font=24).grid(row=0,column=0,padx=2)
 Label(row1col0Frame, text="2", font=24).grid(row=1,column=0,padx=2)
-Label(row1col0Frame, text="3", font=24).grid(row=0,column=0,padx=2)
+Label(row1col0Frame, text="3", font=24).grid(row=2,column=0,padx=2)
 Label(row2col0Frame, text="4", font=24).grid(row=0,column=0,padx=2)
 Label(row2col0Frame, text="5", font=24).grid(row=1,column=0,padx=2)
 Label(row2col0Frame, text="6", font=24).grid(row=2,column=0,padx=2)
@@ -379,18 +383,12 @@ row3col3Frame.grid(row=3,column=3, padx=2)
 
 tableFrame.pack() # pack a frame
 
-# initial random 30 numbers at first
-for time in range(30):
-    row = randint(0,8)
-    col = randint(0,8)
-    num = randint(1,9)
-    if vrowcol9x9[row][col].get() == "":
-        vrowcol9x9[row][col].set(str(num))
-        rowcol9x9[row][col].configure(state="disabled")
-
+# initial random 100 numbers at first
+init_random(100)
+    
 buttonFrame = Frame(root) # button frame
 Button(buttonFrame, text="Submit", font=32, command=submit).grid(row=0,column=0, padx=5) # a button to check
-Button(buttonFrame, text="Previous", font=32, command=previous).grid(row=0,column=1, padx=5) # a button to pervious
+Button(buttonFrame, text="Previous", font=32, command=previous).grid(row=0,column=1, padx=5) # a button to pervious 
 buttonFrame.pack(pady=10, anchor="center")
 
 root.mainloop() # start window
