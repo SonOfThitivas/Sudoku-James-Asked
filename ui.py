@@ -1,44 +1,46 @@
 from tkinter import *
 from random import randint
-
-def check3x3(row, col):
-    global rowcol3x3, vrowcol3x3
-    if vrowcol3x3[row][col].get() == "":
-        return False
-    for r in range(9):
-        if vrowcol3x3[row][col] in vrowcol3x3[r]:
-            if vrowcol3x3[row][col].get() != "" and (vrowcol3x3[row][col].get()).isdigit():
-                num = int(vrowcol3x3[row][col].get())
-                if num > 0 and num < 10:
-                    for c in range(9):
-                        if (r == row and c == col) or vrowcol3x3[r][c].get() == "":
+from time import sleep
+   
+def submit():
+    global vrowcol3x3, vrowcol9x9, rowcol9x9, rowcolLatest, rowcolFirstInit, resultText
+    counts = 0
+    resultText.set("")
+    for pickrow in range(9):
+        for pickcol in range(9):
+            if (rowcol9x9[pickrow][pickcol]["state"] == "disabled") or not(rowcol9x9[pickrow][pickcol].get()):
+                counts += 1
+                break
+            num = vrowcol9x9[pickrow][pickcol].get()
+            #check 3x3
+            flag = True
+            for i in range(9):
+                if vrowcol3x3[pickrow][pickcol] in vrowcol3x3[i]:
+                    for j in range(9):
+                        if j == pickcol or  not((vrowcol3x3[i][j].get()).isdigit()):
                             continue
-                        elif int(vrowcol3x3[r][c].get()) == num:
-                            return False
-            break
-    return True
-
-def check9x9(row, col, is3x3True):
-    global rowcol9x9, vrowcol9x9, rowcolLatest
-    if vrowcol9x9[row][col].get() != "" and (vrowcol9x9[row][col].get()).isdigit():
-        num = int(vrowcol9x9[row][col].get())
-        if num > 0 and num < 10:
-            for r in range(9):
-                for c in range(9):
-                    if (r == row and c == col) or vrowcol9x9[r][c].get() == "":
-                        continue
-                    elif int(vrowcol9x9[r][c].get()) == num:
-                        return False
-    if is3x3True:
-        rowcolLatest.append((row, col))
-        rowcol9x9[row][col].configure(state="disabled")
-        return True 
-        
-def submit():  
-    for row in range(9):
-        for col in range(9):
-            is3x3True = check3x3(row, col)
-            check9x9(row, col, is3x3True)
+                        elif vrowcol3x3[i][j].get() == num:
+                            flag = False
+                            break
+                    # check 9x9
+                    if flag:
+                        for r in range(9):
+                            for c in range(9):
+                                if (r == pickrow and c == pickcol) or not((vrowcol9x9[r][c].get()).isdigit()):
+                                    continue
+                                elif vrowcol9x9[r][c].get() == num:
+                                    flag = False
+                                    break
+                            if not(flag):
+                                break
+                        if flag:
+                            if ((pickrow, pickcol) not in rowcolLatest) and ((pickrow, pickcol) not in rowcolFirstInit):
+                                rowcolLatest.append((pickrow, pickcol))
+                                rowcol9x9[pickrow][pickcol].configure(state="disabled")
+                    break
+                
+    if counts == 81:
+        resultText.set("!!! GAME OVER !!!")
             
 def previous():
     global rowcolLatest, rowcol9x9, vrowcol9x9
@@ -47,11 +49,48 @@ def previous():
     col = pop[1]
     rowcol9x9[row][col].configure(state="normal")
     vrowcol9x9[row][col].set("")
+
+def init_random(n):
+    global vrowcol3x3, vrowcol9x9, rowcol9x9, rowcolFirstInit
+    for time in range(n):
+        row = randint(0,8)
+        col = randint(0,8)
+        num = randint(1,9)
+        #check 3x3
+        flag = True
+        for i in range(9):
+            if vrowcol3x3[row][col] in vrowcol3x3[i]:
+                for j in range(9):
+                    if j == col or  not((vrowcol3x3[i][j].get()).isdigit()):
+                        continue
+                    elif vrowcol3x3[i][j].get() == str(num):
+                        flag = False
+                        break
+                # check 9x9
+                if flag:
+                    for r in range(9):
+                        for c in range(9):
+                            if (r == row and c == col) or not((vrowcol9x9[r][c].get()).isdigit()):
+                                continue
+                            elif vrowcol9x9[r][c].get() == str(num):
+                                flag = False
+                                break
+                        if not(flag):
+                            break
+                    if flag:
+                        vrowcol9x9[row][col].set(str(num))
+                        rowcolFirstInit.append((row, col))
+                        rowcol9x9[row][col].configure(state="disabled")
+                break
             
 root = Tk() # declear module
 root.title("Sudoku James Asked") # title of the window
 Label( text="Sudoku James Asked", font=("Arial", 25)).pack() # text on head
 rowcolLatest = [] # contain all widgets that happens
+rowcolFirstInit = []
+# declear text that displays what is happening
+resultText = StringVar() # text line 1
+resultText.set("!!! GAME START !!!")
 
 # define variables to contain data
 vr1c1, vr1c2, vr1c3, vr1c4, vr1c5, vr1c6, vr1c7, vr1c8, vr1c9 = [StringVar() for i in range(9)]
@@ -86,9 +125,6 @@ vrowcol3x3 = [[vr1c1, vr1c2, vr1c3,vr2c1, vr2c2, vr2c3, vr3c1, vr3c2, vr3c3], # 
               [vr7c1, vr7c2, vr7c3,vr8c1, vr8c2, vr8c3, vr9c1, vr9c2, vr9c3], # 3x1
               [vr7c4, vr7c5, vr7c6,vr8c4, vr8c5, vr8c6, vr9c4, vr9c5, vr9c6], # 3x2
               [vr7c7, vr7c8, vr7c9,vr8c7, vr8c8, vr8c9, vr9c7, vr9c8, vr9c9]] # 3x3
-
-# declear text that displays what is happening
-resultText1 = StringVar(value="!!! GAME START !!!") # text line 1
 
 # section for the table
 tableFrame = Frame(root) # frame for contain the table
@@ -216,7 +252,7 @@ rowcol9x9 = [[r1c1, r1c2, r1c3, r1c4, r1c5, r1c6, r1c7, r1c8, r1c9],
            [r8c1, r8c2, r8c3, r8c4, r8c5, r8c6, r8c7, r8c8, r8c9],
            [r9c1, r9c2, r9c3, r9c4, r9c5, r9c6, r9c7, r9c8, r9c9]]
 
-# list in 3x3 that starts left to right, up to down
+# # list in 3x3 that starts left to right, up to down
 rowcol3x3 = [[r1c1, r1c2, r1c3,r2c1, r2c2, r2c3, r3c1, r3c2, r3c3], # 1x1
               [r1c4, r1c5, r1c6,r2c4, r2c5, r2c6, r3c4, r3c5, r3c6], # 1x2
               [r1c7, r1c8, r1c9,r2c7, r2c8, r2c9, r3c7, r3c8, r3c9], # 1x3
@@ -348,14 +384,15 @@ row2col3Frame.grid(row=2,column=3, padx=2)
 row3col1Frame.grid(row=3,column=1, padx=2)
 row3col2Frame.grid(row=3,column=2, padx=2)
 row3col3Frame.grid(row=3,column=3, padx=2)
-
 tableFrame.pack() # pack a frame
+
+init_random(30)
 
 buttonFrame = Frame(root) # button frame
 Button(buttonFrame, text="Submit", font=("Arial", 25), command=submit).grid(row=0,column=0, padx=5) # a button to check
 Button(buttonFrame, text="Previous", font=("Arial", 25), command=previous).grid(row=0,column=1, padx=5) # a button to pervious 
 buttonFrame.pack(pady=10, anchor="center")
 
-Label(root, text=resultText1.get(), font=("Arial", 25)).pack()
+Label(root, textvariable=resultText, font=("Arial", 25)).pack()
 
 root.mainloop() # start window
