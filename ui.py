@@ -1,95 +1,63 @@
 from tkinter import *
 from random import randint
 
-# check in 3x3 table
-def checkInput3x3(value, row, col): # row is 1 table
-    global rowcol3x3, vrowcol3x3 ,rowcolLatest
-    if value == "":
+def check3x3(row, col):
+    global vrowcol3x3
+    if not((vrowcol3x3[row][col].get()).isdigit()) or vrowcol3x3[row][col].get() == "":
         return 0
-    # check table 3x3 # only 1 loop because in vrowcol3x3 in one row = one table has changed row already # list setup
-    for i in range(9): # in colunmn 
-        if col == i: # point the same row and column
-                continue # do not check
-        elif (vrowcol3x3[row][i]).get() == value: # if there is a same number
-            return row, i # return row and column that the same value
-    
-    # if nothing is wrong
-    rowcolLatest.append((row, col, 3))
-    return None
-    
-# check in table 9x9
-def checkInput9x9(value, row, col, returnFrom3x3):
-    if returnFrom3x3 != None or value == "":
+    for c in range(9):
+        if col == c:
+            continue
+        elif vrowcol3x3[row][c].get() == vrowcol3x3[row][col].get():
+            return 0
+
+    return True
+
+def check9x9(row, col, checked3x3):
+    global vrowcol9x9, rowcol9x9, rowcolLatest
+    if not((vrowcol9x9[row][col].get()).isdigit()) or vrowcol9x9[row][col].get() ==  "":
         return 0
-    global rowcol9x9, vrowcol9x9 , rowcolLatest
-    result = [] # a list for return same value in tuple
-    # check table 9x9
-    for r in range(9): # loop in column with slicing rows
-        if r == row: # the same row and column will skip
-            continue
-        elif  value == (vrowcol9x9[r][col]).get(): # if there is a same number in row
-            result.append((r, col)) # add row and column that the same value
-            
-    for c in range(9): # loop in row with slicing columns
-        if c == col: # the same row and column will skip
-            continue
-        elif  value == (vrowcol9x9[row][c]).get(): # if there is a same number in row
-            result.append((row, c)) # add row and column that the same value
-            
-    if len(result) == 0: # if nothing is wrong
-        vrowcol9x9[row][col].set(str(value))
-        rowcol9x9[row][col].configure(state="disabled")
-        rowcolLatest.append((row, col, 9))
-        return None
-    else:
-        return result
-    
-# submit button
+    for r in range(9):
+        for c in range(9):
+            if r == row and c == col:
+                continue
+            elif vrowcol9x9[r][c].get() == vrowcol9x9[row][col].get():
+                return 0
+    if checked3x3:
+        (rowcol9x9[row][col]).configure(state="disabled")
+        rowcolLatest.append((row, col))
+
 def submit():
-    global vrowcol3x3, vrowcol9x9, rowcol9x9, resultText1
-    # check all
+    global rowcol9x9, resultText1
     counts = 0
     for row in range(9):
         for col in range(9):
-            returnFrom3x3 = checkInput3x3(vrowcol3x3[row][col].get(), row, col)
-            returnFrom9x9 = checkInput9x9(vrowcol9x9[row][col].get(), row, col, returnFrom3x3)
+            checked3x3 = check3x3(row, col)
+            checked9x9 = check9x9(row, col, checked3x3)
             if rowcol9x9[row][col]["state"] == "disabled":
                 counts += 1
-                
     if counts == 81:
         resultText1.set("!!! GAME OVER !!!")
         
-# function previous event
 def previous():
-    global vrowcol3x3, rowcol3x3, vrowcol9x9, rowcol9x9, rowcolLatest # take variables outside the function
-    rowcolIndex = rowcolLatest.pop() # take a last widget
-    row = rowcolIndex[0] # row of latest widget
-    col = rowcolIndex[1] # col of latest widget
-    table = rowcolIndex[2]
-    if table == 3:
-        rowcol3x3[row][col].configure(state="normal") # be normal
-        vrowcol3x3[row][col].set("") # clear a input
-    else:
-        rowcol9x9[row][col].configure(state="normal") # be normal
-        vrowcol9x9[row][col].set("") # clear a input
-        
+    global rowcolLatest, rowcol9x9, vrowcol9x9
+    result = rowcolLatest.pop()
+    row = result[0]
+    col = result[1]
+    rowcol9x9[row][col]["state"] = "normal"
+    vrowcol9x9[row][col].set("")
+    
 def init_random(n):
-    global rowcolLatest
-    for time in range(n):
+    global rowcol9x9, vrowcol9x9, rowcolLatest
+    for i in range(n):
         row = randint(0,8)
         col = randint(0,8)
         num = randint(1,9)
-        if vrowcol9x9[row][col].get() == "":
-            vrowcol9x9[row][col].set(str(num))
-    
-    submit()
-    for i in range(9):
-        for j in range(9):
-            if rowcol9x9[i][j]["state"] != "disabled":
-                vrowcol9x9[i][j].set("")
-    
+        vrowcol9x9[row][col].set(str(num))
+        submit()
+ 
     rowcolLatest.clear()
-
+    
 root = Tk() # declear module
 root.title("Sudoku James Asked") # title of the window
 Label( text="Sudoku James Asked", font=24).pack() # text on head
@@ -394,7 +362,7 @@ row3col3Frame.grid(row=3,column=3, padx=2)
 tableFrame.pack() # pack a frame
 
 # initial random 100 numbers at first
-init_random(100)    
+# init_random(30)    
 
 buttonFrame = Frame(root) # button frame
 Button(buttonFrame, text="Submit", font=32, command=submit).grid(row=0,column=0, padx=5) # a button to check
