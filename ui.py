@@ -8,16 +8,20 @@ def submit():
     resultText.set("")
     for pickrow in range(9):
         for pickcol in range(9):
-            if (rowcol9x9[pickrow][pickcol]["state"] == "disabled") or not(rowcol9x9[pickrow][pickcol].get()):
+            if len(vrowcol9x9[pickrow][pickcol].get()) == 0 or not (vrowcol9x9[pickrow][pickcol].get()).isdigit():
+                continue
+            if rowcol9x9[pickrow][pickcol]["state"] == "disabled":
                 counts += 1
-                break
+                continue
+            if int(vrowcol9x9[pickrow][pickcol].get()) < 1 or int(vrowcol9x9[pickrow][pickcol].get()) > 9:
+                continue
             num = vrowcol9x9[pickrow][pickcol].get()
             #check 3x3
-            flag = True
+            flag = True    
             for i in range(9):
                 if vrowcol3x3[pickrow][pickcol] in vrowcol3x3[i]:
                     for j in range(9):
-                        if j == pickcol or  not((vrowcol3x3[i][j].get()).isdigit()):
+                        if j == pickcol:
                             continue
                         elif vrowcol3x3[i][j].get() == num:
                             flag = False
@@ -26,7 +30,7 @@ def submit():
                     if flag:
                         for r in range(9):
                             for c in range(9):
-                                if (r == pickrow and c == pickcol) or not((vrowcol9x9[r][c].get()).isdigit()):
+                                if (r == pickrow and c == pickcol):
                                     continue
                                 elif vrowcol9x9[r][c].get() == num:
                                     flag = False
@@ -34,9 +38,8 @@ def submit():
                             if not(flag):
                                 break
                         if flag:
-                            if ((pickrow, pickcol) not in rowcolLatest) and ((pickrow, pickcol) not in rowcolFirstInit):
-                                rowcolLatest.append((pickrow, pickcol))
-                                rowcol9x9[pickrow][pickcol].configure(state="disabled")
+                            rowcolFirstInit.append((pickrow, pickcol))
+                            rowcol9x9[pickrow][pickcol].configure(state="disabled")
                     break
                 
     if counts == 81:
