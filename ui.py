@@ -1,6 +1,5 @@
 from tkinter import *
 from random import randint
-from time import sleep
    
 def submit():
     global vrowcol3x3, vrowcol9x9, rowcol9x9, rowcolLatest, rowcolFirstInit, resultText
@@ -13,7 +12,7 @@ def submit():
             if rowcol9x9[pickrow][pickcol]["state"] == "disabled":
                 counts += 1
                 continue
-            if int(vrowcol9x9[pickrow][pickcol].get()) < 1 or int(vrowcol9x9[pickrow][pickcol].get()) > 9:
+            if not(int(vrowcol9x9[pickrow][pickcol].get()) < 10 and int(vrowcol9x9[pickrow][pickcol].get()) > 0):
                 continue
             num = vrowcol9x9[pickrow][pickcol].get()
             #check 3x3
@@ -26,19 +25,27 @@ def submit():
                         elif vrowcol3x3[i][j].get() == num:
                             flag = False
                             break
-                    # check 9x9
+                    # check 9x9 
                     if flag:
-                        for r in range(9):
-                            for c in range(9):
-                                if (r == pickrow and c == pickcol):
-                                    continue
-                                elif vrowcol9x9[r][c].get() == num:
-                                    flag = False
-                                    break
+                        for r in range(9): # check in column
+                            if r == pickrow:
+                                continue
+                            elif vrowcol9x9[r][pickcol].get() == num:
+                                flag = False
+                                break
+                            if not(flag):
+                                break
+                        for c in range(9): # check in row
+                            if c == pickcol:
+                                continue
+                            elif vrowcol9x9[r][pickcol].get() == num:
+                                flag = False
+                                break
                             if not(flag):
                                 break
                         if flag:
-                            rowcolFirstInit.append((pickrow, pickcol))
+                            if (pickrow, pickcol) not in rowcolLatest and (pickrow, pickcol) not in rowcolFirstInit:
+                                rowcolLatest.append((pickrow, pickcol))
                             rowcol9x9[pickrow][pickcol].configure(state="disabled")
                     break
                 
@@ -71,19 +78,28 @@ def init_random(n):
                         break
                 # check 9x9
                 if flag:
-                    for r in range(9):
-                        for c in range(9):
-                            if (r == row and c == col) or not((vrowcol9x9[r][c].get()).isdigit()):
-                                continue
-                            elif vrowcol9x9[r][c].get() == str(num):
-                                flag = False
-                                break
-                        if not(flag):
+                    # check in column
+                    for c in range(9):
+                        if c == col or not((vrowcol9x9[row][c].get()).isdigit()):
+                            continue
+                        elif vrowcol9x9[row][c].get() == str(num):
+                            flag = False
                             break
-                    if flag:
-                        vrowcol9x9[row][col].set(str(num))
-                        rowcolFirstInit.append((row, col))
-                        rowcol9x9[row][col].configure(state="disabled")
+                    if not(flag):
+                        break
+                    # check in row
+                    for r in range(9):
+                        if r == row or not((vrowcol9x9[r][col].get()).isdigit()):
+                            continue
+                        elif vrowcol9x9[r][col].get() == str(num):
+                            flag = False
+                            break
+                    if not(flag):
+                        break
+                if flag:
+                    vrowcol9x9[row][col].set(str(num))
+                    rowcolFirstInit.append((row, col))
+                    rowcol9x9[row][col].configure(state="disabled")
                 break
             
 root = Tk() # declear module
